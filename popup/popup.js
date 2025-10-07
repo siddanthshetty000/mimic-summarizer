@@ -1,24 +1,36 @@
 
+
 document.getElementById("downloadModel").addEventListener("click", () => {
 
     initializePromptAPI();
 });
 
 document.getElementById("loadContent").addEventListener("click", () => {
+    document.getElementById("loadContent").disabled = true;
+    document.getElementById("sendText").disabled = true;
 
-    generateText();
+    generateText()
+        .catch((e) => console.log(e.message))
+        .then(() => {
+            document.getElementById("loadContent").disabled = false;
+            document.getElementById("sendText").disabled = false;
+        });
 
 });
 
 document.getElementById("sendText").addEventListener("click", () => {
-
-    sendReply();
+    document.getElementById("loadContent").disabled = true;
+    document.getElementById("sendText").disabled = true;
+    sendReply().catch((e) => console.log(e.message))
+        .then(() => {
+            document.getElementById("loadContent").disabled = false;
+            document.getElementById("sendText").disabled = false;
+        });
 
 });
 
 async function getStorageVal(name) {
     return await chrome.storage.local.get([name]);
-
 }
 
 
@@ -146,8 +158,10 @@ async function initializePromptAPI() {
         let availability = await LanguageModel.availability();
 
         if (availability === "available") {
-            console.log("available");
+            document.getElementById('LocalModelStatus').style.backgroundColor = "green";
             return;
+        } else {
+            document.getElementById('LocalModelStatus').style.backgroundColor = "orange";
         }
 
         session = await LanguageModel.create({
@@ -157,7 +171,12 @@ async function initializePromptAPI() {
                     console.log(`Downloaded ${e.loaded * 100}%`);
                 });
             }
-        });
+        }).catch(
+            document.getElementById('LocalModelStatus').style.backgroundColor = "red"
+        )
+            .then(
+                document.getElementById('LocalModelStatus').style.backgroundColor = "green"
+            );
 
     }
 }
@@ -199,12 +218,12 @@ async function updateEmotions() {
     if (emotions !== null && typeof emotions === 'object' && Object.keys(emotions).length !== 0) {
         emotions = [...emotions];
     } else {
-        emotions = [{ emotion: emotionHTML, debug:1 }]; 
+        emotions = [{ emotion: emotionHTML, debug: 1 }];
     }
 
 
-emotions = [{ emotion: emotionHTML, debug:1 }]; 
-console.log(emotions);
+    emotions = [{ emotion: emotionHTML, debug: 1 }];
+    console.log(emotions);
 
     chrome.storage.local.set({ emotionn: emotions }, function () {
     });
@@ -215,12 +234,33 @@ console.log(emotions);
 
 }
 
-document.getElementById('submitEmotionName').addEventListener("click", () => {
-    updateEmotions();
+// document.getElementById('submitEmotionName').addEventListener("click", () => {
+//     updateEmotions();
 
 
+// });
+
+
+async function updateInitialPrompt() {
+    let initialPrompt = document.getElementById('initialPrompt').value;
+
+    chrome.storage.local.set({ initialPrompt: initialPrompt }, function () {
+    });
+
+    document.getElementById("displayInitialPrompt").innerText = initialPrompt;
+
+}
+
+
+document.getElementById('initialPromptButton').addEventListener("click", () => {
+    updateInitialPrompt();
 });
 
 
-// let emotions = await getStorageVal('emotions');
-// document.getElementById('badgeContainer').innerHTML = `<span id="badge">Anrgy</span>`;
+
+async function init() {
+    let initialPrompt = await getStorageVal("initialPrompt");
+    document.getElementById("displayInitialPrompt").innerText = initialPrompt.initialPrompt;
+}
+
+init();

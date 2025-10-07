@@ -134,7 +134,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            background-image: linear-gradient(to right, #0fd850 0%, #f9f047 100%);
+            background-image: radial-gradient(circle at center, #0fd850 0%, #f9f047 100%);
             transition: .5s ease;
             display: block;
             z-index: -1;
@@ -211,6 +211,13 @@
             vertical-align: middle;
             margin-right: 8px;
         }
+
+        #LocalModelStatus {
+            width: 20px;
+            height: 20px;
+            background-color: transparent;
+            border-radius: 50%;
+        }
     </style>
 </head>
 
@@ -227,7 +234,9 @@
                         </svg>
                     </button>
                     <div class="dropdown-content">
-                        <a href="#" id="downloadModel">Update/Download Model</a>
+                        <a href="#" id="downloadModel" style="display: flex; flex-direction: row;">Check Model Status
+                            <div id="LocalModelStatus"></div>
+                        </a>
                         <a href="#" id="openModalBtn">Open Modal</a>
                         <a href="#" id="option1">Option 1</a>
                         <a href="#" id="option2">Option 2</a>
@@ -258,14 +267,15 @@
             <span class="close" id="closeModalBtn">&times;</span>
             <h2>Modal Form</h2>
             <form id="modalForm">
-                <label for="name">Mimic Emotion Name:</label>
-                <div id="badgeContainer">
+                <label for="name">Initial Prompt:</label>
+                <!-- <div id="badgeContainer">
                     <span id="badge">Anrgy</span>
                     <span id="badge">Laugh</span>
                     <span id="badge">4</span>
-                </div>
-                <input type="text" id="emotionName" name="emotionName" required>
-                <a href="#" id="submitEmotionName">Submit</a>
+                </div> -->
+                <div id="displayInitialPrompt"></div>
+                <input type="text" id="initialPrompt" name="initialPrompt" required>
+                <a href="#" id="initialPromptButton">Submit</a>
             </form>
         </div>
     </div>
