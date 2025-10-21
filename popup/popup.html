@@ -237,7 +237,8 @@
                         <a href="#" id="downloadModel" style="display: flex; flex-direction: row;">Check Model Status
                             <div id="LocalModelStatus"></div>
                         </a>
-                        <a href="#" id="openModalBtn">Open Modal</a>
+                        <a href="#" id="openInitialPromptBtn">Add Initial Prompt</a>
+                        <a href="#" id="clearContext">Clear Context</a>
                         <a href="#" id="option1">Option 1</a>
                         <a href="#" id="option2">Option 2</a>
                         <a href="#" id="option3">Option 3</a>
@@ -262,20 +263,16 @@
     </div>
 
     <!-- Modal Structure -->
-    <div id="myModal" class="modal">
+    <div id="initialPromptModal" class="modal">
         <div class="modal-content">
-            <span class="close" id="closeModalBtn">&times;</span>
-            <h2>Modal Form</h2>
+            <span class="close" id="closeInitailPromptModalBtn">&times;</span>
+            <h2>Initial Prompt</h2>
             <form id="modalForm">
                 <label for="name">Initial Prompt:</label>
-                <!-- <div id="badgeContainer">
-                    <span id="badge">Anrgy</span>
-                    <span id="badge">Laugh</span>
-                    <span id="badge">4</span>
-                </div> -->
                 <div id="displayInitialPrompt"></div>
-                <input type="text" id="initialPrompt" name="initialPrompt" required>
-                <a href="#" id="initialPromptButton">Submit</a>
+                <input type="text" id="initialPrompt" name="initialPrompt"
+                    placeholder="example: Summarize this in third person just like Julius Ceasar" required>
+                <a href="#" id="initialPromptButton">Update</a>
             </form>
         </div>
     </div>

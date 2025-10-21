@@ -45,11 +45,13 @@ async function sendReply() {
     if (tmpVal) {
         initialPrompt = [...tmpVal];
     } else {
+
+        let initialText = await getStorageVal('initialPrompt');
+
         initialPrompt = [
             {
                 role: 'system',
-                content:
-                    'You are to summarize article in third person just like Julius Caesar would do.',
+                content: initialText.initialPrompt,
             },
 
         ];
@@ -103,25 +105,19 @@ async function generateText() {
         });
     });
 
+
+    let initialText = await getStorageVal('initialPrompt');
+
     let initialPrompt = [
 
         {
             role: 'system',
-            content:
-                'You are to summarize article in third person just like Julius Caesar would do.',
+            content: initialText.initialPrompt,
         },
-
     ];
 
-
     const session = await LanguageModel.create({
-        initialPrompts: [
-            {
-                role: 'system',
-                content:
-                    'You are to summarize article in third person just like Julius Caesar would do.',
-            },
-        ],
+        initialPrompts: initialPrompt
     });
 
     let addedContent = "";
@@ -149,7 +145,6 @@ async function generateText() {
     return result;
 }
 
-
 async function initializePromptAPI() {
 
 
@@ -173,11 +168,9 @@ async function initializePromptAPI() {
             }
         }).catch(
             document.getElementById('LocalModelStatus').style.backgroundColor = "red"
-        )
-            .then(
-                document.getElementById('LocalModelStatus').style.backgroundColor = "green"
-            );
-
+        ).then(
+            document.getElementById('LocalModelStatus').style.backgroundColor = "green"
+        );
     }
 }
 
@@ -194,17 +187,21 @@ window.onclick = function (event) {
 };
 
 // Simple modal open/close handler
-document.getElementById('openModalBtn').onclick = function () {
-    document.getElementById('myModal').style.display = 'block';
+document.getElementById('openInitialPromptBtn').onclick = function () {
+    document.getElementById('initialPromptModal').style.display = 'block';
 };
-document.getElementById('closeModalBtn').onclick = function () {
-    document.getElementById('myModal').style.display = 'none';
+document.getElementById('closeInitailPromptModalBtn').onclick = function () {
+    document.getElementById('initialPromptModal').style.display = 'none';
 };
 window.onclick = function (event) {
-    if (event.target == document.getElementById('myModal')) {
-        document.getElementById('myModal').style.display = 'none';
+    if (event.target == document.getElementById('initialPromptModal')) {
+        document.getElementById('initialPromptModal').style.display = 'none';
     }
 };
+
+document.getElementById('clearContext').addEventListener('click', () => {
+    chrome.storage.local.remove("initialPrompts");
+});
 
 async function updateEmotions() {
     let emotions = await getStorageVal("emotionn");
