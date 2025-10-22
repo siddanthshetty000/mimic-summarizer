@@ -2,15 +2,23 @@
 
 document.getElementById("downloadModel").addEventListener("click", () => {
 
-    initializePromptAPI();
+    initializePromptAPI().catch((e) => {
+        console.log(e.message);
+        document.getElementById('LocalModelStatus').style.backgroundColor = "red";
+    });
 });
 
 document.getElementById("loadContent").addEventListener("click", () => {
     document.getElementById("loadContent").disabled = true;
     document.getElementById("sendText").disabled = true;
+    document.getElementById("userText").innerHTML = "";
 
     generateText()
-        .catch((e) => console.log(e.message))
+        .catch((e) => {
+            console.log(e.message);
+            document.getElementById("loadContent").disabled = false;
+            document.getElementById("sendText").disabled = false;
+        })
         .then(() => {
             document.getElementById("loadContent").disabled = false;
             document.getElementById("sendText").disabled = false;
@@ -21,7 +29,11 @@ document.getElementById("loadContent").addEventListener("click", () => {
 document.getElementById("sendText").addEventListener("click", () => {
     document.getElementById("loadContent").disabled = true;
     document.getElementById("sendText").disabled = true;
-    sendReply().catch((e) => console.log(e.message))
+    sendReply().catch((e) => {
+        console.log(e.message);
+        document.getElementById("loadContent").disabled = false;
+        document.getElementById("sendText").disabled = false;
+    })
         .then(() => {
             document.getElementById("loadContent").disabled = false;
             document.getElementById("sendText").disabled = false;
@@ -83,11 +95,9 @@ async function sendReply() {
     }];
 
 
-    chrome.storage.local.set({ initialPrompts: initialPrompt }, function () {
-    });
+    chrome.storage.local.set({ initialPrompts: initialPrompt });
 
     return result;
-
 }
 
 
@@ -109,7 +119,6 @@ async function generateText() {
     let initialText = await getStorageVal('initialPrompt');
 
     let initialPrompt = [
-
         {
             role: 'system',
             content: initialText.initialPrompt,
@@ -199,65 +208,94 @@ window.onclick = function (event) {
     }
 };
 
+// Simple modal API handler
+// document.getElementById('openAPIBtn').onclick = function () {
+//     document.getElementById('externalAPIModal').style.display = 'block';
+// };
+// document.getElementById('closeExternalAPIModalBtn').onclick = function () {
+//     document.getElementById('externalAPIModal').style.display = 'none';
+// };
+// window.onclick = function (event) {
+//     if (event.target == document.getElementById('externalAPIModal')) {
+//         document.getElementById('externalAPIModal').style.display = 'none';
+//     }
+// };
+
 document.getElementById('clearContext').addEventListener('click', () => {
     chrome.storage.local.remove("initialPrompts");
 });
-
-async function updateEmotions() {
-    let emotions = await getStorageVal("emotionn");
-
-    const emotionHTML = document.getElementById('emotionName').value;
-
-    console.log(typeof emotions);
-
-    console.log(emotions);
-
-    if (emotions !== null && typeof emotions === 'object' && Object.keys(emotions).length !== 0) {
-        emotions = [...emotions];
-    } else {
-        emotions = [{ emotion: emotionHTML, debug: 1 }];
-    }
-
-
-    emotions = [{ emotion: emotionHTML, debug: 1 }];
-    console.log(emotions);
-
-    chrome.storage.local.set({ emotionn: emotions }, function () {
-    });
-
-    // emotions.forEach(element => {
-    //     console.log(element.emotions);
-    // });
-
-}
-
-// document.getElementById('submitEmotionName').addEventListener("click", () => {
-//     updateEmotions();
-
-
-// });
 
 
 async function updateInitialPrompt() {
     let initialPrompt = document.getElementById('initialPrompt').value;
 
-    chrome.storage.local.set({ initialPrompt: initialPrompt }, function () {
-    });
+    chrome.storage.local.set({ initialPrompt: initialPrompt });
 
     document.getElementById("displayInitialPrompt").innerText = initialPrompt;
 
 }
+
+async function updateApiPrompt() {
+    let webUrl = document.getElementById('webUrl').value;
+    let apiKey = document.getElementById('apiKey').value;
+    chrome.storage.local.set({ webUrl: webUrl });
+    chrome.storage.local.set({ apiKey: apiKey });
+
+    document.getElementById("displayWebUrl").innerText = webUrl;
+    document.getElementById("displayApiKey").innerText = apiKey;
+}
+
+const useApiCheckbox = document.getElementById('useApi');
+
+useApiCheckbox.addEventListener('change', function () {
+    const isChecked = this.checked;
+
+    chrome.storage.local.set({ useWebApi: isChecked });
+
+});
+
 
 
 document.getElementById('initialPromptButton').addEventListener("click", () => {
     updateInitialPrompt();
 });
 
-
+document.getElementById('updateApiButton').addEventListener("click", () => {
+    updateApiPrompt();
+});
 
 async function init() {
-    let initialPrompt = await getStorageVal("initialPrompt");
-    document.getElementById("displayInitialPrompt").innerText = initialPrompt.initialPrompt;
+    try {
+        let initialPrompt = await getStorageVal("initialPrompt");
+        let webUrl = await getStorageVal("webUrl");
+        let apiKey = await getStorageVal("apiKey");
+        let setLastText = await getStorageVal("initialPrompts");
+        let useWebApi = await getStorageVal("useWebApi");
+
+        if (initialPrompt && 'initialPrompt' in initialPrompt) {
+            document.getElementById("displayInitialPrompt").innerText = initialPrompt.initialPrompt;
+        } else {
+            document.getElementById("displayInitialPrompt").innerText = '';
+        }
+        if (webUrl && 'webUrl' in webUrl) {
+            document.getElementById("displayWebUrl").innerText = webUrl.webUrl;
+        } else {
+            document.getElementById("displayWebUrl").innerText = '';
+        }
+        if (apiKey && 'apiKey' in apiKey) {
+            document.getElementById("displayApiKey").innerText = apiKey.apiKey;
+        } else {
+            document.getElementById("displayApiKey").innerText = '';
+        }
+        if (setLastText && setLastText.initialPrompts) {
+            document.getElementById("content").innerText = setLastText.initialPrompts.slice(-1)[0].content;
+        } else {
+            document.getElementById("content").innerText = '';
+        }
+        document.getElementById("useApi").checked = useWebApi.useWebApi;
+    } catch (e) {
+        document.getElementById("content").innerText = e.message;
+    }
 }
 
 init();
