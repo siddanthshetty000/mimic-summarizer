@@ -1,3 +1,8 @@
+# Mimic Summarizer
+---
+Ever feel overwhelmed by long articles, or walls of text online? You're not alone. What if you could understand any webpage in seconds, without the headache? Introducing Mimic Summarizer 
+---
+
 ## To install a Chrome extension, follow these concise steps:
 ### Steps to Install a Chrome Extension
 
@@ -13,3 +18,4 @@
 10. Use the bottom message to chat or ask questions 
 
 Each step ensures that your extension is safely installed and ready to use in your browser.
+---
