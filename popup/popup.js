@@ -223,6 +223,7 @@ window.onclick = function (event) {
 
 document.getElementById('clearContext').addEventListener('click', () => {
     chrome.storage.local.remove("initialPrompts");
+    document.getElementById('content').innerText = "";
 });
 
 
